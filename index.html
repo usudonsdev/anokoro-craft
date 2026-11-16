@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- 公開先のURLが決まったら「https://anokoro.kotobabench.com/」をすべて置き換えてください（robots.txt と sitemap.xml も） -->
+<title>あのころクラフト｜旧コンソール版の思い出を遊べるマイクラサーバー（Java版・統合版・Switch対応）</title>
+<meta name="description" content="Wii U・PS Vita・PS3/PS4・Xbox 360 のマイクラで遊んだミニゲームやチュートリアルワールドを、あの頃の手ざわりで。Java版・統合版（スマホ・Windows・Switch・PS・Xbox）から無料で参加できる日本のマインクラフトサーバーです。">
+<link rel="canonical" href="https://anokoro.kotobabench.com/">
+<meta name="theme-color" content="#3b5e2a">
+<link rel="icon" href="favicon.png" type="image/png">
+<link rel="apple-touch-icon" href="favicon.png">
+
+<!-- SNSで共有されたときの表示 -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="あのころクラフト">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:url" content="https://anokoro.kotobabench.com/">
+<meta property="og:title" content="あのころクラフト｜旧コンソール版の思い出を遊べるマイクラサーバー">
+<meta property="og:description" content="あの頃ロビーで遊んだミニゲームと、歩いて覚えるチュートリアルワールド。Java版・統合版・Switchから参加できます。">
+<meta property="og:image" content="https://anokoro.kotobabench.com/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+
+<!-- 検索エンジン向けの構造化データ -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "name": "あのころクラフト",
+      "alternateName": ["あのころクラフト マイクラサーバー", "LEGACY CONSOLE CLUB"],
+      "url": "https://anokoro.kotobabench.com/",
+      "inLanguage": "ja"
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {"@type": "Question", "name": "Switch や PS4・PS5 のマイクラから入れますか？",
+         "acceptedAnswer": {"@type": "Answer", "text": "はい。ゲーム機では外部サーバーを直接追加できないため、運営のアカウントをフレンドに追加し、フレンドタブから参加する方式を用意します。"}},
+        {"@type": "Question", "name": "Java版と統合版、どちらで遊べますか？",
+         "acceptedAnswer": {"@type": "Answer", "text": "どちらでも遊べます。Java版・統合版（スマホ・Windows・Switch・PS・Xbox）のプレイヤーが同じサーバーで一緒に遊べます。"}},
+        {"@type": "Question", "name": "旧コンソール版にあったミニゲームは遊べますか？",
+         "acceptedAnswer": {"@type": "Answer", "text": "当時のミニゲームの遊び方を参考にした、オリジナルのミニゲームを順番に公開します。マップはすべて自作です。"}},
+        {"@type": "Question", "name": "参加にお金はかかりますか？",
+         "acceptedAnswer": {"@type": "Answer", "text": "無料です。マインクラフト本体を持っていれば参加できます。"}}
+      ]
+    }
+  ]
+}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DotGothic16&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<script src="config.js"></script>
+</head>
+<body>
+<canvas id="panorama" aria-hidden="true"></canvas>
+<div class="vignette" aria-hidden="true"></div>
+
+<button id="bgm" class="corner-btn" aria-pressed="false" title="BGM（オリジナル生成）">♪ OFF</button>
+
+<main id="app">
+
+  <!-- タイトル画面 -->
+  <section class="screen active" id="title" data-screen>
+    <div class="logo-wrap">
+      <h1 class="logo"><span data-site-name>あのころクラフト</span></h1>
+      <div class="logo-sub" data-site-sub>LEGACY CONSOLE CLUB</div>
+      <div class="splash" id="splash">あの頃のロビーへ、おかえり。</div>
+    </div>
+    <nav class="menu" aria-label="メインメニュー">
+      <button class="mc-btn primary" data-go="join">サーバーに入る</button>
+      <button class="mc-btn" data-go="games">ミニゲーム</button>
+      <button class="mc-btn" data-go="tutorial">チュートリアルワールド</button>
+      <div class="menu-row">
+        <button class="mc-btn" data-go="legacy">あの頃の機能</button>
+        <button class="mc-btn" data-go="roadmap">ロードマップ</button>
+      </div>
+      <div class="menu-row">
+        <button class="mc-btn" data-go="faq">よくある質問</button>
+        <button class="mc-btn" data-go="follow">コミュニティ</button>
+      </div>
+    </nav>
+    <div class="status-chip" id="status-chip">● サーバー準備中</div>
+    <p class="intro">Wii U・PS Vita・PS3/PS4・Xbox 360 のマイクラで遊んでいた人へ。<br>Java版・統合版・Switch から無料で参加できる、日本のファンサーバーです。</p>
+  </section>
+
+  <!-- 参加 -->
+  <section class="screen" id="join" data-screen>
+    <h2 class="panel-title">サーバーに入る</h2>
+    <div class="panel">
+      <p class="panel-lead">遊んでいる機種を選んでください。</p>
+      <div class="tabs" role="tablist">
+        <button class="mc-btn tab active" data-tab="bedrock" role="tab">スマホ・Windows<br><small>統合版</small></button>
+        <button class="mc-btn tab" data-tab="java" role="tab">PC<br><small>Java版</small></button>
+        <button class="mc-btn tab" data-tab="console" role="tab">Switch・PS・Xbox<br><small>統合版</small></button>
+      </div>
+
+      <div class="tab-body active" data-body="bedrock">
+        <p>ボタンを押すとマイクラが開き、サーバーがリストに追加されます。</p>
+        <a class="mc-btn primary wide" id="bedrock-link" href="#">ワンクリックで追加して開く</a>
+        <div class="addr">
+          <span>アドレス <b data-bedrock-host>—</b></span>
+          <span>ポート <b data-bedrock-port>—</b></span>
+          <button class="mc-btn small" data-copy="bedrock">コピー</button>
+        </div>
+        <p class="note">マイクラが開かないときは「サーバー」タブ →「サーバーを追加」に上のアドレスを入力してください。</p>
+      </div>
+
+      <div class="tab-body" data-body="java">
+        <p>Java版にはサイトから直接入る仕組みがないため、アドレスのコピーで参加します。</p>
+        <button class="mc-btn primary wide" data-copy="java">アドレスをコピー</button>
+        <div class="addr"><span>アドレス <b data-java-addr>—</b></span></div>
+        <ol class="steps">
+          <li>マイクラを起動 →「マルチプレイ」</li>
+          <li>「サーバーを追加」→ アドレス欄に貼り付け</li>
+          <li>リストからサーバーを選んで「接続」</li>
+        </ol>
+      </div>
+
+      <div class="tab-body" data-body="console">
+        <p>家庭用ゲーム機では、外部サーバーを直接追加できません。<br>
+          <b>フレンド経由で参加する方法</b>を準備しています。</p>
+        <ol class="steps">
+          <li>運営の Xbox（Microsoft）アカウントをフレンドに追加</li>
+          <li>マイクラの「フレンド」タブに、サーバーが参加できるワールドとして表示されます</li>
+          <li>選ぶだけで参加できます</li>
+        </ol>
+        <p class="note">フレンド用アカウントの ID は、サーバー公開時にここに表示します。</p>
+      </div>
+
+      <div class="server-box" id="server-box">
+        <div class="server-icon" aria-hidden="true"></div>
+        <div class="server-info">
+          <div class="server-name" data-site-name>あのころクラフト</div>
+          <div class="server-motd" id="server-motd">サーバー準備中</div>
+        </div>
+        <div class="server-ping" id="server-ping"><span class="bars off"></span><span id="server-players">-/-</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ミニゲーム -->
+  <section class="screen" id="games" data-screen>
+    <h2 class="panel-title">ミニゲーム</h2>
+    <div class="panel">
+      <p class="panel-lead">あの頃ロビーで遊んだ遊びを、オリジナルのマップで。</p>
+      <div class="cards">
+        <article class="card">
+          <div class="card-art art-fall" aria-hidden="true"></div>
+          <div class="card-body">
+            <h3>フォールダウン <span class="tag hot">最初に公開</span></h3>
+            <p>雪のフロアをシャベルで掘って、相手を下に落とす。最後まで立っていた人の勝ち。雪玉モードもあります。</p>
+            <div class="meta">2〜16人 ／ 1ラウンド 約3分</div>
+          </div>
+        </article>
+        <article class="card">
+          <div class="card-art art-sky" aria-hidden="true"></div>
+          <div class="card-body">
+            <h3>スカイレース <span class="tag">予定</span></h3>
+            <p>エリトラで空のリングをくぐるタイムアタック。ブーストリングで一気に加速。</p>
+            <div class="meta">1〜8人 ／ タイムアタック・対戦</div>
+          </div>
+        </article>
+        <article class="card">
+          <div class="card-art art-arena" aria-hidden="true"></div>
+          <div class="card-body">
+            <h3>サバイバルアリーナ <span class="tag">予定</span></h3>
+            <p>チェストを開けて装備を集め、最後の一人になるまで戦う。マップは全部オリジナル。</p>
+            <div class="meta">4〜16人 ／ 1ラウンド 約8分</div>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- チュートリアル -->
+  <section class="screen" id="tutorial" data-screen>
+    <h2 class="panel-title">チュートリアルワールド</h2>
+    <div class="panel">
+      <p class="panel-lead">看板を読みながら歩いて覚える、あの「最初のワールド」を作り直します。</p>
+      <div class="route">
+        <div class="stop"><b>1</b><span>うごく・ジャンプ・<br>ブロックを壊す</span></div>
+        <div class="stop"><b>2</b><span>クラフトと<br>かまど</span></div>
+        <div class="stop"><b>3</b><span>はじめての夜と<br>ベッド</span></div>
+        <div class="stop"><b>4</b><span>農業と<br>動物</span></div>
+        <div class="stop"><b>5</b><span>ネザーへの<br>ゲート</span></div>
+        <div class="stop"><b>6</b><span>ミニゲーム<br>ロビーへ</span></div>
+      </div>
+      <ul class="bullets">
+        <li>建物・地形はすべて自作。当時の雰囲気だけを借ります。</li>
+        <li>初めての人の入口であり、懐かしい人の散歩コースでもあります。</li>
+        <li>ゴールがそのままミニゲームのロビーにつながります。</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- レガシー機能 -->
+  <section class="screen" id="legacy" data-screen>
+    <h2 class="panel-title">あの頃の機能</h2>
+    <div class="panel">
+      <div class="feature-grid">
+        <div class="feature"><h3>864×864の世界</h3><p>端が見える、あの小さなワールド。ワールドの境界ごと再現します。</p></div>
+        <div class="feature"><h3>ロード画面のヒント</h3><p>ワールド移動のたびに、当時のようなひと言ヒントを表示します。</p></div>
+        <div class="feature"><h3>かんたんクラフト</h3><p>レシピを覚えていなくても作れる、カテゴリ選択式のクラフト画面（予定）。</p></div>
+        <div class="feature"><h3>ホストの特権</h3><p>ワールドの持ち主が、飛行・透明化・時間変更をメニューから使える仕組み（予定）。</p></div>
+        <div class="feature"><h3>ミニゲームロビー</h3><p>待ち時間に走り回れる、小さなロビー。</p></div>
+        <div class="feature"><h3>ゲーム機の友達と</h3><p>Java版・スマホ・ゲーム機の全員が同じサーバーで遊べます。</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ロードマップ -->
+  <section class="screen" id="roadmap" data-screen>
+    <h2 class="panel-title">ロードマップ</h2>
+    <div class="panel">
+      <ol class="timeline">
+        <li class="done"><b>フェーズ1</b> このサイトを公開</li>
+        <li class="now"><b>フェーズ2</b> サーバーを開放（Java版＋統合版）・ロビー</li>
+        <li><b>フェーズ3</b> ミニゲーム第1弾「フォールダウン」</li>
+        <li><b>フェーズ4</b> チュートリアルワールド</li>
+        <li><b>フェーズ5</b> ゲーム機からのフレンド参加・スカイレース</li>
+      </ol>
+      <p class="note">制作のようすは開発記で公開していきます。<a id="devlog-link" href="#" hidden>開発記を読む →</a></p>
+    </div>
+  </section>
+
+  <!-- よくある質問 -->
+  <section class="screen" id="faq" data-screen>
+    <h2 class="panel-title">よくある質問</h2>
+    <div class="panel">
+      <dl class="faq">
+        <dt>Switch や PS4・PS5 のマイクラから入れますか？</dt>
+        <dd>はい。ゲーム機では外部サーバーを直接追加できないため、運営のアカウントをフレンドに追加し、フレンドタブから参加する方式を用意します。</dd>
+        <dt>Java版と統合版、どちらで遊べますか？</dt>
+        <dd>どちらでも遊べます。Java版・統合版（スマホ・Windows・Switch・PS・Xbox）のプレイヤーが同じサーバーで一緒に遊べます。</dd>
+        <dt>旧コンソール版にあったミニゲームは遊べますか？</dt>
+        <dd>当時のミニゲームの遊び方を参考にした、オリジナルのミニゲームを順番に公開します。マップはすべて自作です。</dd>
+        <dt>参加にお金はかかりますか？</dt>
+        <dd>無料です。マインクラフト本体を持っていれば参加できます。</dd>
+      </dl>
+      <p class="note">ほかに知りたいことは、X または Discord で気軽に聞いてください。</p>
+    </div>
+  </section>
+
+  <!-- コミュニティ -->
+  <section class="screen" id="follow" data-screen>
+    <h2 class="panel-title">コミュニティ</h2>
+    <div class="panel">
+      <p class="panel-lead">あの頃の思い出を話せる場所を、Discord に作りました。</p>
+      <div class="feature-grid">
+        <div class="feature"><h3>あの頃の思い出</h3><p>Wii U・PS Vita・Xbox 360…当時の機種の名札を付けて、思い出話ができます。</p></div>
+        <div class="feature"><h3>いっしょに遊ぼう</h3><p>ミニゲームの仲間集めや、月1回の大会のお知らせ。</p></div>
+        <div class="feature"><h3>アイデア箱</h3><p>「あのミニゲームがほしい」「あの機能を戻して」をリクエストできます。</p></div>
+      </div>
+      <div class="menu narrow" style="margin-top:18px">
+        <a class="mc-btn primary" id="discord-link" href="#">Discord に参加する</a>
+        <a class="mc-btn" id="x-link" href="#">X（旧Twitter）をフォロー</a>
+      </div>
+      <p class="note" id="links-pending">リンクは準備中です。</p>
+      <p class="note">Discord は13歳以上が利用できます。お知らせは X とこのサイトにも載せます。</p>
+    </div>
+  </section>
+
+</main>
+
+<footer class="hints">
+  <div class="pad-hints">
+    <span><i class="key a">A</i>決定</span>
+    <span><i class="key b">B</i>戻る</span>
+    <span class="hide-sm"><i class="key">↑↓</i>選択</span>
+  </div>
+  <p class="legal">非公式のファンサーバーです。Mojang Studios および Microsoft とは関係ありません。<br>NOT AN OFFICIAL MINECRAFT PRODUCT. NOT APPROVED BY OR ASSOCIATED WITH MOJANG OR MICROSOFT.</p>
+</footer>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="main.js"></script>
+</body>
+</html>
